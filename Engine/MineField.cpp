@@ -51,6 +51,21 @@ bool MineField::Tile::IsRevealed() const
     return state == State::Revealed;
 }
 
+void MineField::Tile::ToggleFlag()
+{
+    assert(!IsRevealed());
+    if (state == State::Hidden)
+        state = State::Flagged;
+    else
+        state = State::Hidden;
+
+}
+
+bool MineField::Tile::IsFlagged() const
+{
+    return state == State::Flagged;
+}
+
 void MineField::OnRevealClick(const Vei2& screenPos)
 {
     //convert screenPos to gridPos
@@ -58,8 +73,20 @@ void MineField::OnRevealClick(const Vei2& screenPos)
     assert(gridPos.x > 0 && gridPos.x < width && gridPos.y >= 0 && gridPos.y < height);
 
     Tile& tile = TileAt(gridPos);
-    if (!tile.IsRevealed())
+    if (!tile.IsRevealed() && !tile.IsFlagged())
         tile.Reveal();
+}
+
+void MineField::OnFlagClick(const Vei2& screenPos)
+{
+    //convert screenPos to gridPos
+    const Vei2 gridPos = ScreenToGrid(screenPos);
+    assert(gridPos.x > 0 && gridPos.x < width&& gridPos.y >= 0 && gridPos.y < height);
+
+    Tile& tile = TileAt(gridPos);
+    //create a fn in the Tile to toggle a flag
+    if (!tile.IsRevealed())
+        tile.ToggleFlag();
 }
 
 MineField::MineField(int nMines)

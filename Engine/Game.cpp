@@ -40,8 +40,44 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
-	if (wnd.mouse.LeftIsPressed())
-		field.OnRevealClick(wnd.mouse.GetPos());
+	//flag blinking - if clicked, the event spans accross frames until the btn is realeased
+	//fns are called each time
+	//detect when it actually gets pressed - dont check it each frame
+	//event processing in this framework in the mouse class
+		//if (wnd.mouse.LeftIsPressed())
+		//{
+		//	//check if the cursor is inside the rect of the field
+		//	const Vei2 mousePos = wnd.mouse.GetPos();
+		//	if (field.GetRect().Contains(mousePos))
+		//		field.OnRevealClick(mousePos);
+		//}
+		//else if (wnd.mouse.RightIsPressed())
+		//{
+		//	//check if the cursor is inside the rect of the field
+		//	const Vei2 mousePos = wnd.mouse.GetPos();
+		//	if (field.GetRect().Contains(mousePos))
+		//		field.OnFlagClick(mousePos);
+		//}
+
+	//while there are events in the queue to be processed
+	while (!wnd.mouse.IsEmpty())
+	{
+		const auto e = wnd.mouse.Read();
+		if (e.GetType() == Mouse::Event::Type::LPress)
+		{
+			//check if the cursor is inside the rect of the field
+			const Vei2 mousePos = e.GetPos();
+			if (field.GetRect().Contains(mousePos))
+				field.OnRevealClick(mousePos);
+		}
+		else if (e.GetType() == Mouse::Event::Type::RPress)
+		{
+			//check if the cursor is inside the rect of the field
+			const Vei2 mousePos = e.GetPos();
+			if (field.GetRect().Contains(mousePos))
+				field.OnFlagClick(mousePos);
+		}
+	}
 }
 
 void Game::ComposeFrame()
