@@ -20,14 +20,16 @@ private:
 		//besides Draw in MineField, we need a Draw for a tile
 		//besides gfx, we need to know the pixel coords to put them on the screen
 		//Vei2 will represent 2 concepts - grid pos and pixel pos
-		void Draw(const Vei2& screenPos, Graphics& gfx) const;
+		void Draw(const Vei2& screenPos, bool blown, Graphics& gfx) const;
 		void Reveal();
 		bool IsRevealed() const;
 		void ToggleFlag();
 		bool IsFlagged() const;
+		void SetNeighborMineCount(int mineCount);
 	private:
 		State state = State::Hidden;
 		bool hasMine = false;
+		int nNeighborMines = -1;
 	};
 public:
 	MineField(int nMines);
@@ -41,11 +43,13 @@ private:
 	static constexpr int height = 16;
 	static constexpr int nFields = width * height;
 	Tile field[width * height];
+	bool isBlown = false;
 private:
 	//if the fn is const you cannot return a non-const reference!!
 	//you can create another version for this fn - the have identical code, but one of them is a const version
 	Tile& TileAt(const Vei2& gridPos);
 	const Tile& TileAt(const Vei2& gridPos) const;
 	const Vei2 ScreenToGrid(const Vei2& screenPos);
+	int CountNeighborMines(const Vei2& gridPos);
 };
 
