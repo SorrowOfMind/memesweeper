@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Graphics.h"
+#include "SpriteCodex.h"
 
 class MineField
 {
@@ -51,5 +52,6 @@ private:
 	const Tile& TileAt(const Vei2& gridPos) const;
 	const Vei2 ScreenToGrid(const Vei2& screenPos);
 	int CountNeighborMines(const Vei2& gridPos);
+	const Vei2 startPoint{ Graphics::ScreenWidth / 2 - ((width * SpriteCodex::tileSize) / 2),  Graphics::ScreenHeight / 2 - ((height * SpriteCodex::tileSize) / 2)};
 };
 
