@@ -2,7 +2,6 @@
 #include <assert.h>
 #include <random>
 #include "Vei2.h"
-#include "SpriteCodex.h"
 
 void MineField::Tile::SpawnMine()
 {
@@ -118,7 +117,9 @@ void MineField::OnRevealClick(const Vei2& screenPos)
     {
         //convert screenPos to gridPos
         const Vei2 gridPos = ScreenToGrid(screenPos);
-        assert(gridPos.x > 0 && gridPos.x < width && gridPos.y >= 0 && gridPos.y < height);
+        //assert(gridPos.x > 0 && gridPos.x < width&& gridPos.y >= 0 && gridPos.y < height);
+        //TODO: 
+        assert(gridPos.x >= 0 && gridPos.x < width && gridPos.y >= 0 && gridPos.y < height);
 
         Tile& tile = TileAt(gridPos);
         if (!tile.IsRevealed() && !tile.IsFlagged())
@@ -196,14 +197,15 @@ void MineField::Draw(Graphics& gfx) const
     {
         for (gridPos.x = 0; gridPos.x < width; gridPos.x++) //cols
         {
-            TileAt(gridPos).Draw(gridPos * SpriteCodex::tileSize, isBlown, gfx);
+            TileAt(gridPos).Draw(gridPos * SpriteCodex::tileSize + startPoint, isBlown, gfx);
         }
     }
 }
 
 RectI MineField::GetRect() const
 {
-    return RectI(0,width * SpriteCodex::tileSize, 0, height * SpriteCodex::tileSize);
+    //return RectI(0, width * SpriteCodex::tileSize, 0, height * SpriteCodex::tileSize);
+    return RectI(startPoint.x, startPoint.x + width * SpriteCodex::tileSize, startPoint.y, startPoint.y + height * SpriteCodex::tileSize);
 }
 
 MineField::Tile& MineField::TileAt(const Vei2& gridPos)
@@ -218,7 +220,8 @@ const MineField::Tile& MineField::TileAt(const Vei2& gridPos) const
 
 const Vei2 MineField::ScreenToGrid(const Vei2& screenPos)
 {
-    return (screenPos / SpriteCodex::tileSize);
+    //return (screenPos / SpriteCodex::tileSize);
+    return ((screenPos - startPoint) / SpriteCodex::tileSize);
 }
 
 int MineField::CountNeighborMines(const Vei2& gridPos)
