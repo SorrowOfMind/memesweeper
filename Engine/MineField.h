@@ -33,15 +33,22 @@ private:
 		int nNeighborMines = -1;
 	};
 public:
+	enum class PlayerState
+	{
+		Looser = 0,
+		Winner = 1,
+		Ongoing = 2
+	};
 	MineField(int nMines);
 	void Draw(Graphics& gfx) const;
 	RectI GetRect() const;
 	void OnRevealClick(const Vei2& screenPos);
 	//to flag a tile
 	void OnFlagClick(const Vei2& screenPos);
+	static PlayerState playerState;
 private:
-	static constexpr int width = 20;
-	static constexpr int height = 16;
+	static constexpr int width = 15;
+	static constexpr int height = 15;
 	static constexpr int nFields = width * height;
 	Tile field[width * height];
 	bool isBlown = false;
@@ -52,6 +59,9 @@ private:
 	const Tile& TileAt(const Vei2& gridPos) const;
 	const Vei2 ScreenToGrid(const Vei2& screenPos);
 	int CountNeighborMines(const Vei2& gridPos);
-	const Vei2 startPoint{ Graphics::ScreenWidth / 2 - ((width * SpriteCodex::tileSize) / 2),  Graphics::ScreenHeight / 2 - ((height * SpriteCodex::tileSize) / 2)};
+	const Vei2 startPoint{ Graphics::ScreenWidth / 2 - ((width * SpriteCodex::tileSize) / 2),  Graphics::ScreenHeight / 2 - ((height * SpriteCodex::tileSize) / 2) };
+	bool areAllRevealed();
+	static constexpr int borderThickness = 10;
+	static constexpr Color borderColor = Colors::Blue;
 };
 
