@@ -255,13 +255,19 @@ int MineField::CountNeighborMines(const Vei2& gridPos)
 bool MineField::areAllRevealed()
 {
     bool allRevealed = true;
-    for (Vei2 gridPos = { 0,0 }; gridPos.y < height; gridPos.y++) //rows
+    //for (Vei2 gridPos = { 0,0 }; gridPos.y < height; gridPos.y++) //rows
+    //{
+    //    for (gridPos.x = 0; gridPos.x < width; gridPos.x++) //cols
+    //    {
+    //        allRevealed = allRevealed && ((TileAt(gridPos).IsFlagged() && TileAt(gridPos).HasMine()) 
+    //            || (TileAt(gridPos).IsRevealed() && !TileAt(gridPos).HasMine()));
+    //    }
+    //}
+    // 
+    //more elegant way
+    for (const Tile& t : field)
     {
-        for (gridPos.x = 0; gridPos.x < width; gridPos.x++) //cols
-        {
-            allRevealed = allRevealed && ((TileAt(gridPos).IsFlagged() && TileAt(gridPos).HasMine()) 
-                || (TileAt(gridPos).IsRevealed() && !TileAt(gridPos).HasMine()));
-        }
+        allRevealed = allRevealed && ((t.IsFlagged() && t.HasMine()) || (t.IsRevealed() && !t.HasMine()));
     }
 
     return allRevealed;
