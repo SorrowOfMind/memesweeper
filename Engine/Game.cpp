@@ -25,7 +25,8 @@ Game::Game( MainWindow& wnd )
 	:
 	wnd( wnd ),
 	gfx( wnd ),
-	field(20)
+	field(1),
+	soundGameOver(L"spayed.wav")
 	
 {
 }
@@ -83,4 +84,11 @@ void Game::UpdateModel()
 void Game::ComposeFrame()
 {
 	field.Draw(gfx);
+	if (field.playerState == MineField::PlayerState::Winner)
+	{
+		Vei2 winPos = { 400,300 };
+		SpriteCodex::DrawWin(winPos, gfx);
+	}
+	else if (field.playerState == MineField::PlayerState::Looser)
+		soundGameOver.Play();
 }

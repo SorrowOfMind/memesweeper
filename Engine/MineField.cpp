@@ -3,6 +3,8 @@
 #include <random>
 #include "Vei2.h"
 
+MineField::PlayerState MineField::playerState = MineField::PlayerState::Ongoing;
+
 void MineField::Tile::SpawnMine()
 {
     assert(!hasMine);//only spawn on tiles without a bomb
@@ -113,13 +115,13 @@ void MineField::Tile::SetNeighborMineCount(int mineCount)
 void MineField::OnRevealClick(const Vei2& screenPos)
 {
     //first check if is over
-    if (!isBlown)
+    if (!isBlown && playerState == PlayerState::Ongoing)
     {
         //convert screenPos to gridPos
         const Vei2 gridPos = ScreenToGrid(screenPos);
         //assert(gridPos.x > 0 && gridPos.x < width&& gridPos.y >= 0 && gridPos.y < height);
         //TODO: 
-        assert(gridPos.x >= 0 && gridPos.x < width && gridPos.y >= 0 && gridPos.y < height);
+        assert(gridPos.x >= 0 && gridPos.x < width&& gridPos.y >= 0 && gridPos.y < height);
 
         Tile& tile = TileAt(gridPos);
         if (!tile.IsRevealed() && !tile.IsFlagged())
@@ -128,25 +130,30 @@ void MineField::OnRevealClick(const Vei2& screenPos)
             if (tile.HasMine())
             {
                 isBlown = true;
+                playerState = PlayerState::Looser;
             }
+            else if (areAllRevealed())
+                playerState = PlayerState::Winner;
         }
-
-
     }
 }
 
 void MineField::OnFlagClick(const Vei2& screenPos)
 {
-    if (!isBlown)
+    if (!isBlown && playerState == PlayerState::Ongoing)
     {
         //convert screenPos to gridPos
         const Vei2 gridPos = ScreenToGrid(screenPos);
-        assert(gridPos.x > 0 && gridPos.x < width&& gridPos.y >= 0 && gridPos.y < height);
+        assert(gridPos.x >= 0 && gridPos.x < width&& gridPos.y >= 0 && gridPos.y < height);
 
         Tile& tile = TileAt(gridPos);
         //create a fn in the Tile to toggle a flag
         if (!tile.IsRevealed())
+        {
             tile.ToggleFlag();
+            if (areAllRevealed())
+                playerState = PlayerState::Winner;
+        }
     }
 }
 
@@ -241,4 +248,19 @@ int MineField::CountNeighborMines(const Vei2& gridPos)
         }
     }
     return count;
+}
+
+bool MineField::areAllRevealed()
+{
+    bool allRevealed = true;
+    for (Vei2 gridPos = { 0,0 }; gridPos.y < height; gridPos.y++) //rows
+    {
+        for (gridPos.x = 0; gridPos.x < width; gridPos.x++) //cols
+        {
+            allRevealed = allRevealed && ((TileAt(gridPos).IsFlagged() && TileAt(gridPos).HasMine()) 
+                || (TileAt(gridPos).IsRevealed() && !TileAt(gridPos).HasMine()));
+        }
+    }
+
+    return allRevealed;
 }
