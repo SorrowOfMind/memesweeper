@@ -197,6 +197,8 @@ MineField::MineField(int nMines)
 
 void MineField::Draw(Graphics& gfx) const
 {   
+    //border - here not very efficient code
+    gfx.DrawRect(GetRect().GetExpanded(borderThickness), borderColor);
     //the background of the tiles is currently black - draw a big rect for the whole grid underneath the tiles
     gfx.DrawRect(GetRect(), SpriteCodex::baseColor);
     //instead of i,j - we can make one initializer {0,0}
