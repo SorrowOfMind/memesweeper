@@ -27,6 +27,7 @@ private:
 		void ToggleFlag();
 		bool IsFlagged() const;
 		void SetNeighborMineCount(int mineCount);
+		bool HasNoNeighborMines() const;
 	private:
 		State state = State::Hidden;
 		bool hasMine = false;
@@ -52,6 +53,7 @@ private:
 	static constexpr int nFields = width * height;
 	Tile field[width * height];
 	bool isBlown = false;
+	void RevealTile(const Vei2& gridPos);
 private:
 	//if the fn is const you cannot return a non-const reference!!
 	//you can create another version for this fn - the have identical code, but one of them is a const version

@@ -112,6 +112,11 @@ void MineField::Tile::SetNeighborMineCount(int mineCount)
     nNeighborMines = mineCount;
 }
 
+bool MineField::Tile::HasNoNeighborMines() const
+{
+    return nNeighborMines == 0;
+}
+
 void MineField::OnRevealClick(const Vei2& screenPos)
 {
     //first check if is over
@@ -123,18 +128,10 @@ void MineField::OnRevealClick(const Vei2& screenPos)
         //TODO: 
         assert(gridPos.x >= 0 && gridPos.x < width&& gridPos.y >= 0 && gridPos.y < height);
 
-        Tile& tile = TileAt(gridPos);
-        if (!tile.IsRevealed() && !tile.IsFlagged())
-        {
-            tile.Reveal();
-            if (tile.HasMine())
-            {
-                isBlown = true;
-                playerState = PlayerState::Looser;
-            }
-            else if (areAllRevealed())
-                playerState = PlayerState::Winner;
-        }
+        RevealTile(gridPos);
+
+        if (areAllRevealed())
+            playerState = PlayerState::Winner;
     }
 }
 
@@ -156,6 +153,8 @@ void MineField::OnFlagClick(const Vei2& screenPos)
         }
     }
 }
+
+
 
 MineField::MineField(int nMines)
 {
@@ -222,6 +221,33 @@ MineField::Tile& MineField::TileAt(const Vei2& gridPos)
     return field[gridPos.y * width + gridPos.x];
 }
 
+void MineField::RevealTile(const Vei2& gridPos)
+{
+    Tile& tile = TileAt(gridPos);
+    if (!tile.IsRevealed() && !tile.IsFlagged())
+    {
+        tile.Reveal();
+        if (tile.HasMine())
+        {
+            isBlown = true;
+            playerState = PlayerState::Looser;
+        }
+        else if (tile.HasNoNeighborMines())
+        {
+            const int xStart = std::max(0, gridPos.x - 1); //if at the edge gridPos.x - 1 will give us 0
+            const int yStart = std::max(0, gridPos.y - 1);
+            const int xEnd = std::min(width - 1, gridPos.x + 1);
+            const int yEnd = std::min(height - 1, gridPos.y + 1);
+
+            for (Vei2 gridPos = { xStart,yStart }; gridPos.y <= yEnd; gridPos.y++)
+            {
+                for (gridPos.x = xStart; gridPos.x <= xEnd; gridPos.x++)
+                    RevealTile(gridPos);
+            }
+        }
+    }
+}
+
 const MineField::Tile& MineField::TileAt(const Vei2& gridPos) const
 {
     return field[gridPos.y * width + gridPos.x];
@@ -266,9 +292,7 @@ bool MineField::areAllRevealed()
     // 
     //more elegant way
     for (const Tile& t : field)
-    {
         allRevealed = allRevealed && ((t.IsFlagged() && t.HasMine()) || (t.IsRevealed() && !t.HasMine()));
-    }
 
     return allRevealed;
 }
