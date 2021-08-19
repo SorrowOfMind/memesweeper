@@ -83,12 +83,13 @@ void Game::UpdateModel()
 
 void Game::ComposeFrame()
 {
-	field.Draw(gfx);
-	if (field.playerState == MineField::PlayerState::Winner)
+	if (field.playerState == MineField::PlayerState::Ongoing)
+		field.Draw(gfx);
+	else if (field.playerState == MineField::PlayerState::Winner)
 	{
 		Vei2 winPos = { 400,300 };
 		SpriteCodex::DrawWin(winPos, gfx);
 	}
-	else if (field.playerState == MineField::PlayerState::Looser)
+	else
 		soundGameOver.Play();
 }
